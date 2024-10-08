@@ -27,27 +27,26 @@ const ContactList = () => {
 
   // Get the user from the Zustand store
   const { user } = useUserStore();
-  const userId = user?._id; // Ensure userId is fetched correctly
+  const userid = user?._id; // Ensure userid is fetched correctly
 
   // Fetch contacts from the server
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/contacts", {
-          headers: {
-            Authorization: `Bearer ${userId}`, // Send userId in the Authorization header
-          },
-        });
+        const response = await axios.get("http://localhost:3000/contacts");
         setContacts(response.data); // Assuming the API returns a list of contacts
       } catch (error) {
         console.error("Error fetching contacts:", error);
       }
     };
 
-    if (userId) {
-      fetchContacts(); // Fetch contacts only if userId exists
+    if (userid) {
+      fetchContacts(); // Fetch contacts only if userid exists
     }
-  }, [userId]);
+  }, [userid]);
+
+  // Filter contacts based on userid
+  const userContacts = contacts.filter(contact => contact.userid === userid);
 
   // Handle click on Edit button
   const handleEditClick = (contact) => {
@@ -151,11 +150,11 @@ const ContactList = () => {
               </tr>
             </thead>
             <tbody>
-              {contacts.map((contact) => (
+              {userContacts.map((contact) => (
                 <tr key={contact._id} className="border-t py-3 px-4">
                   {/* Full Name */}
                   <td>
-                    <img src="/user.png" alt="user" height={30} width={30}/>
+                    <img src="/user.png" alt="user" height={30} width={30} />
                   </td>
                   <td className="py-3 px-4">
                     {editContactId === contact._id ? (
@@ -267,14 +266,14 @@ const ContactList = () => {
 
         {/* Success Popup */}
         {showSuccessPopup && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-8 rounded-lg text-center text-teal-950">
-              <p>Your contact has been saved successfully!</p>
+          <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+            <div className="bg-white text-black p-5 rounded">
+              <h2 className="text-xl">Contact Updated!</h2>
               <button
-                className="mt-4 bg-teal-950 text-white px-4 py-2 rounded-full"
                 onClick={() => setShowSuccessPopup(false)}
+                className="mt-4 bg-teal-900 text-white py-2 px-4 rounded"
               >
-                Okay
+                Close
               </button>
             </div>
           </div>
@@ -282,23 +281,22 @@ const ContactList = () => {
 
         {/* Delete Confirmation Popup */}
         {showDeletePopup && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-8 rounded-lg text-center text-teal-950">
-              <p>Are you sure you want to delete this contact?</p>
-              <div className="flex justify-center mt-4">
+          <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+            <div className="bg-white text-black p-5 rounded">
+              <h2 className="text-xl">Are you sure you want to delete this contact?</h2>
+              <div className="flex justify-end mt-4">
                 <button
-                  className="bg-teal-950 rounded-full text-white px-4 py-2 mr-2"
-                  onClick={confirmDeleteContact}
+                  onClick={() => setShowDeletePopup(false)}
+                  className="mr-4 bg-gray-400 text-white py-2 px-4 rounded"
                 >
-                  yes
+                  Cancel
                 </button>
                 <button
-  className="bg-transparent border border-teal-950 text-teal-950 px-4 py-2 rounded-full hover:bg-teal-950 hover:text-white"
-  onClick={() => setShowDeletePopup(false)}
->
-  Cancel
-</button>
-
+                  onClick={confirmDeleteContact}
+                  className="bg-red-600 text-white py-2 px-4 rounded"
+                >
+                  Delete
+                </button>
               </div>
             </div>
           </div>
@@ -306,14 +304,14 @@ const ContactList = () => {
 
         {/* Delete Success Popup */}
         {showDeleteSuccessPopup && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-8 rounded-lg text-center text-teal-950">
-              <p>Your contact has been deleted successfully!</p>
+          <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+            <div className="bg-white text-black p-5 rounded">
+              <h2 className="text-xl">Contact Deleted!</h2>
               <button
-                className="mt-4 bg-teal-950 text-white px-4 py-2 rounded-full"
                 onClick={() => setShowDeleteSuccessPopup(false)}
+                className="mt-4 bg-teal-900 text-white py-2 px-4 rounded"
               >
-                Okay
+                Close
               </button>
             </div>
           </div>
